@@ -93,7 +93,30 @@ J = sum(sum((- Y.*log(h) - (1- Y).* log(1-h))/m)) + Reg_param;
                                               %where elements are in a matrix
 
 
+Del3 = a3-Y;
+%disp(size(Del3));
+%disp(size(z2));
+%disp(size(Theta2(2:end)));
+Del2=  Del3 * Theta2(1:end,2:end) .*sigmoidGradient(z2);
+disp(size(Del2));
+disp(size(Del3));
+Delta1 =  X' *Del2;
+Delta2 =   a2' * Del3;
 
+Theta1_grad =  Delta1/m;
+Theta2_grad = Delta2/m;
+
+Delta1=0;
+Delta2=0;
+for i = 1 : m
+  
+  Del3(i)= a3(i,:) - Y(i,:);
+  
+  Del2(i) = Del3(i,2:end) .* sigmoidGradient(z2(i,:);
+  
+  Delta1 = Delta1 + X(
+  
+endfor
 
 
 
