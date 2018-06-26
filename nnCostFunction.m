@@ -5,7 +5,7 @@ function [J grad] = nnCostFunction(nn_params, ...
                                    X, y, lambda)
 %NNCOSTFUNCTION Implements the neural network cost function for a two layer
 %neural network which performs classification
-%   [J grad] = NNCOSTFUNCTON(nn_params, hidden_layer_size, num_labels, ...
+%   [J grad] = NNCOSTFUNCTON(nn_params, hidden_layer_size, numn,/_labels, ...
 %   X, y, lambda) computes the cost and gradient of the neural network. The
 %   parameters for the neural network are "unrolled" into the vector
 %   nn_params and need to be converted back into the weight matrices. 
@@ -61,7 +61,6 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
-
 Y= zeros(m,num_labels);
 I = eye(num_labels);
 for i = 1:m
@@ -78,64 +77,37 @@ a2 = sigmoid(z2);
 a2 = [ ones(m,1) a2];
 z3 = a2 * Theta2';
 a3 = sigmoid (z3);
-h= a3;                                                      % Calculating H & end forward prop
+h= a3;                                                      % Calculate H & end forward prop
 
+
+% Regularization
 Theta1_sq = Theta1(1:end,2:end)(:).* Theta1(1:end,2:end)(:); %Square thetas for regularization
 Theta2_sq = Theta2(1:end,2:end)(:).* Theta2(1:end,2:end)(:);
 
 Reg_param = [sum(sum(Theta1_sq)) + sum(sum(Theta2_sq))] * (lambda)/(2*m) ;
                                                               % Calculate reg parameter
  
-J = sum(sum((- Y.*log(h) - (1- Y).* log(1-h))/m)) + Reg_param; 
+%Calculate Cost
+ J = sum(sum((- Y.*log(h) - (1- Y).* log(1-h))/m)) + Reg_param; 
                                                               %no transposing its not a regular
                                                               %matrix multiplication...
                                                               %but element wise multiplication..
                                                               %where elements are in a matrix
-                                              
-%Start Back Propagation                                             
-                                              
-                                              
-Del3 = a3-Y;  %Del3 is 5000*10
-Del2=  Del3* Theta2 .*[ones(size(z2,1),1) sigmoidGradient(z2)];
-Delta1 = a1' * Del2(:,2:end);
-Delta2 = a2' * Del3;
 
-Theta1_grad = Theta1_grad +Delta1/m;
-Theta2_grad = Theta2_grad +Delta2/m;
+% Back Propagation
+d3 = a3 - Y;                                                  % has same dimensions as a3
+d2 = (d3*Theta2(1:end,2:end)).*[ sigmoidGradient(z2)];        % has same dimensions as a2
 
-%for i = 1 : m
-  
-%  Del3= a3 - Y(i,:);
-  
-%  Del2 = (Del3*Theta2(1:end,2:end)) .* sigmoidGradient(z2);
-  
-  %disp(size(Del2));
-  %disp(size(Del3));
-  
- % Delta1 = Delta1 + X'*Del2;
- % Delta2 = Delta2 +  a2'* Del3;
- % Theta1_grad =  Delta1/m;
- % Theta2_grad = Delta2/m;
-  
-  
-%endfor
+D1 =  d2' * a1;                                                % has same dimensions as Theta1
+D2 =  d3' * a2;                                                % has same dimensions as Theta2
+                                                              %Flipped the terms got the wrong size for Theta and relative difference was wrong
+
+
+Theta1_grad =   D1/m;
+Theta2_grad =   D2/m;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-% -------------------------------------------------------------
-
-% =========================================================================
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
