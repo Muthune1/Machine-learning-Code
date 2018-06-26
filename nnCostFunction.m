@@ -65,58 +65,61 @@ Theta2_grad = zeros(size(Theta2));
 Y= zeros(m,num_labels);
 I = eye(num_labels);
 for i = 1:m
-  Y(i,:)= I(y(i),:);          % y has been given as labels it needs to be converted..
-  end                          % a matrix of zeros and ones (5000*10) to calc J  
+  Y(i,:)= I(y(i),:);                                      % y has been given as labels it needs to be converted..
+  end                                                     % a matrix of zeros and ones (5000*10) to calc J  
   
 
 % Start forward prop
-X = [ones(m,1) X];                 
+a1 = [ones(m,1) X];                 
 
-z2 = X * Theta1';
+z2 = a1 * Theta1';
 a2 = sigmoid(z2);
 
 a2 = [ ones(m,1) a2];
 z3 = a2 * Theta2';
 a3 = sigmoid (z3);
-h= a3;                          % Calculating H & end forward prop
+h= a3;                                                      % Calculating H & end forward prop
 
 Theta1_sq = Theta1(1:end,2:end)(:).* Theta1(1:end,2:end)(:); %Square thetas for regularization
 Theta2_sq = Theta2(1:end,2:end)(:).* Theta2(1:end,2:end)(:);
 
 Reg_param = [sum(sum(Theta1_sq)) + sum(sum(Theta2_sq))] * (lambda)/(2*m) ;
-                 % Calculate reg parameter
+                                                              % Calculate reg parameter
  
 J = sum(sum((- Y.*log(h) - (1- Y).* log(1-h))/m)) + Reg_param; 
-                                              %no transposing its not a regular
-                                              %matrix multiplication...
-                                              %but element wise multiplication..
-                                              %where elements are in a matrix
+                                                              %no transposing its not a regular
+                                                              %matrix multiplication...
+                                                              %but element wise multiplication..
+                                                              %where elements are in a matrix
+                                              
+%Start Back Propagation                                             
+                                              
+                                              
+Del3 = a3-Y;  %Del3 is 5000*10
+Del2=  Del3* Theta2 .*[ones(size(z2,1),1) sigmoidGradient(z2)];
+Delta1 = a1' * Del2(:,2:end);
+Delta2 = a2' * Del3;
 
+Theta1_grad = Theta1_grad +Delta1/m;
+Theta2_grad = Theta2_grad +Delta2/m;
 
-Del3 = a3-Y;
-%disp(size(Del3));
-%disp(size(z2));
-%disp(size(Theta2(2:end)));
-Del2=  Del3 * Theta2(1:end,2:end) .*sigmoidGradient(z2);
-disp(size(Del2));
-disp(size(Del3));
-Delta1 =  X' *Del2;
-Delta2 =   a2' * Del3;
+%for i = 1 : m
+  
+%  Del3= a3 - Y(i,:);
+  
+%  Del2 = (Del3*Theta2(1:end,2:end)) .* sigmoidGradient(z2);
+  
+  %disp(size(Del2));
+  %disp(size(Del3));
+  
+ % Delta1 = Delta1 + X'*Del2;
+ % Delta2 = Delta2 +  a2'* Del3;
+ % Theta1_grad =  Delta1/m;
+ % Theta2_grad = Delta2/m;
+  
+  
+%endfor
 
-Theta1_grad =  Delta1/m;
-Theta2_grad = Delta2/m;
-
-Delta1=0;
-Delta2=0;
-for i = 1 : m
-  
-  Del3(i)= a3(i,:) - Y(i,:);
-  
-  Del2(i) = Del3(i,2:end) .* sigmoidGradient(z2(i,:);
-  
-  Delta1 = Delta1 + X(
-  
-endfor
 
 
 
