@@ -100,14 +100,15 @@ d2 = (d3*Theta2(1:end,2:end)).*[ sigmoidGradient(z2)];        % has same dimensi
 
 D1 =  d2' * a1;                                                % has same dimensions as Theta1
 D2 =  d3' * a2;                                                % has same dimensions as Theta2
-                                                              %Flipped the terms got the wrong size for Theta and relative difference was wrong
+                                                               %Flipped the terms got the wrong size for Theta and relative difference was wrong
 
 
 Theta1_grad =   D1/m;
 Theta2_grad =   D2/m;
 
-
-
+% Regularize gradients
+Theta1_grad(:,2:end) = Theta1_grad(:,2:end) + lambda * (1/m) * Theta1(:,2:end); 
+Theta2_grad(:,2:end) = Theta2_grad(:,2:end) + lambda * (1/m) * Theta2(:,2:end);
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
